@@ -31,8 +31,7 @@
     boolean isLui;
     boolean isOffset;
     boolean isBranchTaken=false;
-    String branchPC,branchTarget;
-    String finst;
+    String pc,branchTarget,fhinst;
     int [] registerFile;
      String []mem;
     Simulator(int[] registerFile,String []mem){
@@ -72,13 +71,14 @@
         isBge = false;
         isBne = false;
         isLui = false;
-        branchPC = null;
+
         branchTarget = null;
     }
     public void updateControlSignal(String fh_inst){
 //        System.out.println(fh_inst);
 //        System.out.println(fh_inst.substring(25,30)+"-"+fh_inst.substring(17,20)+"-"+fh_inst.substring(0,5));
         if(fh_inst.substring(25,30).equals("01100")){
+//            System.out.println("mei hu from arithemetic operations");
             if(fh_inst.substring(17,20).equals("000")){
                 if(fh_inst.substring(0,5).equals("00000")){
                     isAdd = true;
@@ -109,11 +109,13 @@
             isImmediate = true;
             isAdd = true;
         }
+
         //load inst
         else if(fh_inst.substring(25,30).equals("00000")){
             isOffset = true;
             isLd = true;
         }
+
         //store inst
         else if(fh_inst.substring(25,30).equals("01000")){
             isOffset = true;
@@ -132,6 +134,7 @@
 
         else if(fh_inst.substring(25,30).equals("11000")){
             isOffset = true;
+//            System.out.println("Branch wal bhi run kar");
             if(fh_inst.substring(17,20).equals("000")){
                 isBeq = true;
             }
@@ -152,21 +155,36 @@
 
     }
     public  void fetch(String pc){
+        this.pc = pc;
         int adr = Integer.parseInt(pc,2);
         String fh_inst = mem[adr];
-        finst = fh_inst;
-        System.out.println(fh_inst);
+         fhinst = fh_inst;
+
+
         updateControlSignal(fh_inst);
+//        System.out.println("Instruction:-"+fh_inst);
+//        System.out.println(isBge);
         decode(fh_inst);
 
     }
-
+    public int twoComplement(String num){
+        String temp="";
+        for(int i=0;i<num.length();i++){
+            if(num.charAt(i)=='0'){
+                temp+='1';
+            }
+            else{
+                temp+='0';
+            }
+        }
+        return -1*(Integer.parseInt(temp,2)+1);
+    }
     public void decode(String inst){
         //tasks: calculating the value of immediate,read the src registers
 
         //Immediate Operands Decode
 
-        //contains op1,op2,immx,branchTarget
+        //contains op1,op2,immx,offset
         Object[] arr = new Object[4];
         int op1,op2;
         //Register type(add,sub,and,or,xor,sll,sra
@@ -177,49 +195,85 @@
         arr[0] = op1;
         arr[1] = op2;
         if(isBlt||isBeq||isBne||isBge){
-            branchTarget =  inst.substring(0,1)+inst.substring(24,25)+inst.substring(1,7)+inst.substring(20,24);
-            System.out.println(branchTarget);
-            arr[3] = branchTarget;
+            String offset = inst.substring(0,1)+inst.substring(24,25)+inst.substring(1,7)+inst.substring(20,24);
+            if(offset.substring(0,1).equals("0")){
+                arr[3] = Integer.parseInt(offset,2);
+            }
+            else{
+                arr[3] = twoComplement(offset);
+            }
         }
         if(isImmediate){
             int immx;
             if(isAdd){
                 String imm = inst.substring(0,12);
+//                System.out.println(imm);
                 if(imm.substring(0,1).equals("1")){
-                    imm = "11111111111111111111"+imm;
-                    immx = Integer.parseInt(imm,2);
+                    immx = twoComplement(imm);
+//                    System.out.println("value of immediate stored-"+immx);
                 }
                 else{
-                    imm = "00000000000000000000"+imm;
                     immx = Integer.parseInt(imm,2);
                 }
             }
-            else{
-
+            else {
+                String imm = inst.substring(0,20);
+                //checking if number is negative or positive
+                if(imm.substring(0,1).equals("1")){
+                    immx = twoComplement(imm);
+                }
+                else{
+                    immx = Integer.parseInt(imm,2);
+                }
             }
+
+            arr[2] = (Object) immx;
+
         }
         if(isLd){
-
+            String offset = inst.substring(0,12);
+            if(offset.substring(0,1).equals("0")){
+                arr[3] = Integer.parseInt(offset,2);
+            }
+            else{
+                arr[3] = twoComplement(offset);
+            }
         }
         if(isSt){
-
+            String offset = inst.substring(0,7)+inst.substring(20,25);
+            if(offset.substring(0,1).equals("0")){
+                arr[3] = Integer.parseInt(offset,2);
+            }
+            else{
+                arr[3] = twoComplement(offset);
+            }
         }
         if(isJalr){
-
+            String offset = inst.substring(0,12);
+            if(offset.substring(0,1).equals("0")){
+                arr[3] = Integer.parseInt(offset,2);
+            }
+            else{
+                arr[3] = twoComplement(offset);
+            }
         }
         if(isJal){
-
+            String offset = inst.substring(0,1)+inst.substring(12,20)+inst.substring(11,12)+inst.substring(1,11);
+            if(offset.substring(0,1).equals("0")){
+                arr[3] = Integer.parseInt(offset,2);
+            }
+            else{
+                arr[3] = twoComplement(offset);
+            }
         }
-        if(isLui){
-
-        }
-
         execute(arr);
 //        else if(inst.substring())
     }
-    public void execute(Object[] val){
+     //contains op1,op2,immx,offset
+
+     public void execute(Object[] val){
         Object aluResult=null;
-        System.out.println(val[0]+" -"+val[1]);
+//        System.out.println(val[0]+":"+val[1]);
         //add
         if(isAdd){
             isAdd = false;
@@ -239,6 +293,7 @@
         }
         if(isOr){
             isOr = false;
+
             aluResult = (int)val[0]|(int)val[1];
         }
         if(isXor){
@@ -255,35 +310,87 @@
             isSra = false;
             aluResult = (int)val[0]>>(int)val[1];
         }
-//        if(isAdd){
-//            isSub = false;
-//            aluResult = (int)val[0]-(int)val[1];
-//        }if(isSub){
-//            isSub = false;
-//            aluResult = (int)val[0]-(int)val[1];
-//        }if(isSub){
-//            isSub = false;
-//            aluResult = (int)val[0]-(int)val[1];
-//        }
+        if(isBeq){
+           if((int)val[0]==(int)val[1]){
+//               System.out.println("operation branchequal+branchoffset:"+val[3]);
+                branchTarget = Integer.toBinaryString((int)val[3]);
+            }
+        }
+        if(isBne) {
+            if ((int) val[0] != (int) val[1]) {
+//                System.out.println("operation branchnotequal+branchoffset:"+val[3]);
+//
+                branchTarget = Integer.toBinaryString((int)val[3]);}
+        }
+         if(isBlt) {
+             if ((int) val[0] < (int) val[1]) {
+//                 System.out.println("operation branchlessthan+branchoffset:"+val[3]);
+                 branchTarget = Integer.toBinaryString((int)val[3]);}
+         }
+         if(isBge) {
+             if ((int) val[0] > (int) val[1]) {
+                 System.out.println("Checking for bge");
+//                 System.out.println("operation branchgreater+branchoffset:"+val[3]);
+                 branchTarget = Integer.toBinaryString((int)val[3]);
+             }
+         }
+         if(isJal||isJalr){
+             int pc_val = Integer.parseInt(pc,2);
+             if(isJal){
+                 branchTarget = Integer.toBinaryString((int)val[3]);
+             }
+             if(isJalr){
+                 branchTarget = Integer.toBinaryString((int)val[0]+(int)val[3]);
+             }
 
-        memory((int)aluResult);
+            aluResult = (int)(pc_val+1);
+         }
+
+//         op1,op2,immx,offset
+         if(isLd||isSt){
+            aluResult = (int)val[3]+(int)val[0];
+         }
+         if(isLui){
+            aluResult = (int)val[2];
+            aluResult = (int)aluResult<<12;
+
+         }
+         memory(val,aluResult);
 
     }
-    public void memory(int res){
-     if(isLd|| isSt){
+    public void memory(Object []val,Object res){
+        if(isLd||isLui){
+            if(isLd) {
+                String ldResult = mem[(Integer) res];
+                res = Integer.parseInt(ldResult, 2);
+            }
 
-     }
-     else{
+          writeBack(res);
+        }
+        else if(isSt){
+            String store = Integer.toBinaryString((int)val[1]);
+            if(store.length()<32){
+                int l = store.length();
+                for(int i=0;i<32-l;i++){
+                    store = "0"+store;
+                }
+            }
+            mem[(int)res] = store;
+        }
+        else{
          writeBack(res);
-     }
+        }
     }
 
-    public void writeBack(int ans){
+    public void writeBack(Object ans){
         //writing args=1
-        String adr = finst.substring(20,25);
-        int idx = Integer.parseInt(adr,2);
-        registerFile[idx] = ans;
-        return;
+        if(ans!=null) {
+            String adr = fhinst.substring(20, 25);
+            int idx = Integer.parseInt(adr, 2);
+            registerFile[idx] = (int)ans;
+
+            return;
+        }
+        }
     }
 
-}

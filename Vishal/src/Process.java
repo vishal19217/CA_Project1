@@ -7,11 +7,11 @@ public class Process {
     static String pc=null;
     static String []mem;
     static int [] registerFile = new int[32];
-    public static void Meminitialise(int memCap){
+    public static void MemInitialise(int memCap){
         mem = new String[memCap];
     }
-    public static void Meminitialise(){
-        Meminitialise(256);
+    public static void MemInitialise(){
+        MemInitialise(256);
     }
 
     public static void dumpPC(){
@@ -23,80 +23,108 @@ public class Process {
             System.out.println("R"+i+":"+registerFile[i]);
         }
     }
-//    public static void updatePC(){
-//        if(isBranchTaken){
-//            pc = branchPC;
-//        }
-//
-//        adr = adr+1;
-//        pc = Integer.toHexString(adr);
-//
-//    }
-    public static void main(String[] args){
-        Meminitialise();
-        //00000-00-00100-00011-000-00001-01100-11
-          //111110011100-00011-000-00001-00100-11
-        //add
-        mem[0] = "00000000010000011000000010110011";
-        //sub
-        mem[0] = "00000000010000011101000010110011";
-        //addi
-        mem[0] = "11111001110000011101000010110011";
+    public static int twoComplement(String num){
+    String temp="";
+    for(int i=0;i<num.length();i++){
+        if(num.charAt(i)=='0'){
+            temp+='1';
+        }
+        else{
+            temp+='0';
+        }
+    }
+    return -1*(Integer.parseInt(temp,2)+1);
+    }
+    public static void updatePC(String branchTarget,Simulator s){
+        int pc_val = Integer.parseInt(pc,2);
 
+        if(branchTarget!=null){
+            int bt;
+
+            if(branchTarget.charAt(0)=='1')
+                bt = twoComplement(branchTarget);
+            else
+                bt = Integer.parseInt(branchTarget,2);
+            pc_val = pc_val+bt;
+            if(s.isJalr){
+                pc = branchTarget;
+            }
+        }
+        else{
+            pc_val = pc_val+1;
+        }
+        pc = Integer.toBinaryString(pc_val);
+//        System.out.println("PC VAlue:"+pc_val);
+//        System.out.println("Pc in string val:"+pc);
+
+    }
+    public static void main(String[] args){
+        //pc=pc+1 // 4 byte addressble memory
+        MemInitialise();
+        //00000-00-00010-00001-110-00001-01100-11
+        //00000000000000010010000010000011
+
+
+        mem[0] = "00000000001000001110000010110011"; //for or
+        mem[0] = "00000000000000010010000010000011";//for load
+        mem[2] = "00000000000000000000000000001010"; //data for loading from this memory location
+        mem[0] = "00000000000000010010000010000011";//for load
+        mem[0] = "00000000001100010010001100100011";//for store
+
+        mem[0] = "00000000000001100100001010110111";
+
+        //program for multiplication rs1*rs2
+        mem[0] = "00000000000000000010000010000011" ;
+        mem[1] = "00000000000000001000000010110011";
+        mem[2] = "11111111111100010000000100010011";
+        mem[3] = "00000000000000010101000101100011";
+
+//        mem[1] = "01000000001100010000000100110011";
+//        mem[2] = "11111110001100010101111011100011";
+//        1111 1111 1110
         pc = Integer.toBinaryString(0);
         Simulator s = new Simulator(registerFile,mem);
-        registerFile[1] = 2;
-        registerFile[4] = 1;
-        registerFile[3] = 5;
-        dumpRF();
-        s.fetch(pc);
-        dumpRF();
-        System.out.println(mem[0]);
+        registerFile[0] = 0;
+        registerFile[1] = 5;  //rd
+        registerFile[2] = 3; //rs1
+        registerFile[3] = 10; //rs2
+        //memory access for load = 2
+        int i=0;
+//        System.out.println(mem[8]);
+//        System.out.println(registerFile[5]);
+        while(mem[Integer.parseInt(pc,2)]!=null){
+//            System.out.println("PC ki value:"+pc);
+
+            s.initialise();
+//            dumpRF();
+            s.fetch(pc);
+//            dumpRF();
+            updatePC(s.branchTarget,s);
+            i++;
+
+        }
+        System.out.println(registerFile[1]);
 
     }
 }
+//Program for multiplication
+//load t0 to M[0+rs0] rs0 = 0 ;t0 = rs1
+//load rs2
+//add t0<-t0+r1
+//addi rs2<-rs2-1
+//bgt rs2,rs0,accumulate:
+//load rs0 = t0
+//return
+//00000-00-00010-00001-110-00001-01100-11
 
 
-
-//    initialise the memory
-//      pc = 0
-//        halted = false;
-//        white(not halted)
-//        {
-//            Instruction = MEM.getData(PC); // Get current instruction
-//            halted, new_PC = EE.execute(Instruction); // Update RF compute new_PC
-//            PC.dump(); // Print PC
-//            RF.dump(); // Print RF state
+////program for multiplication rs1*rs2
+//mem[0] = "00000000000000000010000010000011" lw rs1 0(rs0)
+//mem[1] = "00000000000000001000000010110011" add rs1<-rs1+rs0
+//mem[2] = "11111111111100010000000100010011" addi rs2<-rs2-1
+//mem[3] = "00000000000000010101000101100011" bgt rs2,a0,label=1
+////mem[4] = "00000-00-0000-00001-000-00001-01100-11"
+////r1 = rs1
+////r2 = rs2
+//000000
 //
-//            TIMING.dump() // Cycles spent to Process Inst.
-//            PC.update(new_PC); // Update PC
-//        }
-//        MEM.dump()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        while(true) {
-//
-//
-//            String fh_inst = fetch();
-//            Object[] val = decode(fh_inst);
-//            int res = execute(val);
-//            if (fh_inst.substring(25, 29) == "00000" || fh_inst.substring(25, 29) == "01000") {
-////
-//            }
-//            else if (fh_inst.substring(25, 29) == "01100") {
-//                writeBack(res, fh_inst.substring(20, 24), 1);
-//            }
-//            break;
-//        }
