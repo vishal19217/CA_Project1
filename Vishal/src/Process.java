@@ -45,6 +45,7 @@ public class Process {
                 bt = twoComplement(branchTarget);
             else
                 bt = Integer.parseInt(branchTarget,2);
+            System.out.println("Branch Target VAlue"+branchTarget);
             pc_val = pc_val+bt;
             if(s.isJalr){
                 pc = branchTarget;
@@ -73,11 +74,12 @@ public class Process {
 
         mem[0] = "00000000000001100100001010110111";
 
-        //program for multiplication rs1*rs2
-        mem[0] = "00000000000000000010000010000011" ;
-        mem[1] = "00000000000000001000000010110011";
-        mem[2] = "11111111111100010000000100010011";
-        mem[3] = "00000000000000010101000101100011";
+        //program for multiplication rs1 = rs3*rs2
+        mem[7] = "00000000000000000000000000000000";//data stored at mem[7] = 0
+        mem[0] = "00000000011100000010000010000011"; //lw rs1 0(rs0)
+        mem[1] = "00000000001100001000000010110011";//add rs1<-rs1+rs3
+        mem[2] = "11111111111100010000000100010011";//addi rs2<-rs2-1
+        mem[3] = "11111110000000010101111011100011";//bgt rs2,rs0,label=-2
 
 //        mem[1] = "01000000001100010000000100110011";
 //        mem[2] = "11111110001100010101111011100011";
@@ -86,20 +88,21 @@ public class Process {
         Simulator s = new Simulator(registerFile,mem);
         registerFile[0] = 0;
         registerFile[1] = 5;  //rd
-        registerFile[2] = 3; //rs1
-        registerFile[3] = 10; //rs2
+        registerFile[2] = 27; //rs1
+        registerFile[3] = 7; //rs2
         //memory access for load = 2
         int i=0;
-//        System.out.println(mem[8]);
+//        System.out.println(mem[8]);11111111111111111111111111111110
 //        System.out.println(registerFile[5]);
         while(mem[Integer.parseInt(pc,2)]!=null){
-//            System.out.println("PC ki value:"+pc);
+            System.out.println("PC ki value:"+pc);
 
             s.initialise();
 //            dumpRF();
             s.fetch(pc);
-//            dumpRF();
+            dumpRF();
             updatePC(s.branchTarget,s);
+            System.out.println("new PC:"+pc);
             i++;
 
         }
@@ -118,13 +121,20 @@ public class Process {
 //00000-00-00010-00001-110-00001-01100-11
 
 
-////program for multiplication rs1*rs2
-//mem[0] = "00000000000000000010000010000011" lw rs1 0(rs0)
-//mem[1] = "00000000000000001000000010110011" add rs1<-rs1+rs0
-//mem[2] = "11111111111100010000000100010011" addi rs2<-rs2-1
-//mem[3] = "00000000000000010101000101100011" bgt rs2,a0,label=1
+
 ////mem[4] = "00000-00-0000-00001-000-00001-01100-11"
 ////r1 = rs1
 ////r2 = rs2
 //000000
 //
+
+
+
+
+
+//program for multiplication rs1 = rs3*rs2
+//        mem[7] = "00000000000000000000000000000000";//data stored at mem[7] = 0
+//                mem[0] = "00000000011100000010000010000011"; //lw rs1 0(rs0)
+//                mem[1] = "00000000001100001000000010110011";//add rs1<-rs1+rs3
+//                mem[2] = "11111111111100010000000100010011";//addi rs2<-rs2-1
+//                mem[3] = "11111110000000010101111011100011";//bgt rs2,rs0,label=-2
