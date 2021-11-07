@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.*;
 import java.lang.*;
 //
@@ -138,3 +141,15 @@ public class Process {
 //                mem[1] = "00000000001100001000000010110011";//add rs1<-rs1+rs3
 //                mem[2] = "11111111111100010000000100010011";//addi rs2<-rs2-1
 //                mem[3] = "11111110000000010101111011100011";//bgt rs2,rs0,label=-2
+
+
+
+
+//    File assemblyFile = new File("D:\\IIITD\\SEMESTER5\\CATutorial\\AssemblyCode.txt");
+//    BufferedReader br = new BufferedReader(new FileReader(assemblyFile));
+//    String codeLine;
+//    //        while((codeLine=br.readLine())!=null){
+////            System.out.println(codeLine);
+//    String Answer =  assembler_binary("sub rs1 rs2 rs3");
+//            System.out.println(Answer);
+////
