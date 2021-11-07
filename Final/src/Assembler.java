@@ -396,21 +396,89 @@ public class Assembler {
         }
         return(result);
     }
-
-    public static void main(String[] args) throws Exception{
-        // Test
-//        String Answer = assembler_binary("MyLabel: addi r17 r1 -10");
+    public static void treatLabel(HashMap<String,Integer> mp,ArrayList<String> labelArr) throws IOException {
         File assemblyFile = new File("D:\\IIITD\\SEMESTER5\\CATutorial\\AssemblyCode.txt");
         BufferedReader br = new BufferedReader(new FileReader(assemblyFile));
         String codeLine;
+
+        int id=0;
+        //extracting the labels and storing in the labelArr
         while((codeLine=br.readLine())!=null){
-            System.out.println(codeLine);
-            String Answer =  assembler_binary(codeLine);
-            System.out.println(Answer);
+//            System.out.println(codeLine);
+            String arr[] = codeLine.split(" ");
+//            Instruction.indexOf(":") != -1
+            if(arr[0].indexOf(":")!=-1){
+                int len = arr[0].length();
+                labelArr.add(arr[0].substring(0,len-1));
+                mp.put(arr[0].substring(0,len-1),id);
+            }
+            id++;
         }
+        for(String i:labelArr){
+//            System.out.println(i);
+        }
+
+
+
+    }
+    public static String check(String line,ArrayList<String> labelArr){
+        for(String i:labelArr){
+            if(line.indexOf(i)!=-1){
+//                System.out.println(line+" --"+i);
+                return i;
+            }
+        }
+        return null;
+    }
+    public static void main(String[] args) throws Exception{
+        // Test
+        ArrayList<String> labelArr = new ArrayList<>();
+        HashMap<String,Integer> mp=new HashMap<>();
+        treatLabel(mp,labelArr);
+        File assemblyFile = new File("D:\\IIITD\\SEMESTER5\\CATutorial\\AssemblyCode.txt");
+        BufferedReader br = new BufferedReader(new FileReader(assemblyFile));
+        String codeLinee;
+        int id = 0;
+        while((codeLinee=br.readLine())!=null){
+            String codeLine = codeLinee;
+            String arr[] = codeLine.split(" ");
+            String labelPresent = check(codeLine,labelArr);
+            //if instruction contains only label but not jumps etc then simply remove label name from instruction
+            if(labelPresent!=null && codeLine.indexOf(":")!=-1){
+                int idx = codeLine.indexOf(arr[1]);
+                codeLine = codeLine.substring(idx);
+            }
+            //if the instruction is branch then simply replace the label with offset
+            else if(labelPresent!=null){
+                int offset = mp.get(labelPresent)-id;
+                codeLine = arr[0]+" "+arr[1]+" "+arr[2]+" "+Integer.toString(offset);
+            }
+
+
+
+//          System.out.println(codeLine);
+            String Answer = assembler_binary(codeLine);
+            System.out.println(Answer);
+            id++;
+        }
+////
+//        File assemblyFile = new File("D:\\IIITD\\SEMESTER5\\CATutorial\\AssemblyCode.txt");
+//        BufferedReader br = new BufferedReader(new FileReader(assemblyFile));
+//        String codeLine;
+//        while((codeLine=br.readLine())!=null){
+//            System.out.println(codeLine);
+//            String Answer =  assembler_binary(codeLine);
+//            System.out.println(Answer);
+//        }
 //        System.out.println(Answer);
 //        System.out.println(Answer.length());
 //        System.out.println(Integer.toBinaryString(-10));
 //        System.out.println(truncate(Integer.toBinaryString(-10),10));
     }
 }
+//    beq r0 r1 DONE
+//    add r5  r6 r2
+//    addi r1 r1 -1
+//    DONE: sub r1 r3 r4
+
+
