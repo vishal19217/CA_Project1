@@ -1,13 +1,17 @@
 package CA_Project;
+
 public class Assembler {
 
-//    static String reverse_string(String str){
-//        String temp = "";
-//        for(int i = 0 ; i<str.length() ; i++){
-//            temp = str.charAt(i)+temp;
-//        }
-//        return temp;
-//    }
+    static String truncate(String str, int size){
+        String temp = "";
+        for(int i = str.length()-1 ; i>=0 ; i--){
+            temp = str.charAt(i) + temp;
+            if(temp.length()==size){
+                break;
+            }
+        }
+        return temp;
+    }
 
     static String assembler_binary(String Instruction) {
 
@@ -55,6 +59,9 @@ public class Assembler {
             imm = Integer.toBinaryString(Integer.parseInt(arr[3]));
             while(imm.length()<12) {
                 imm = "0"+imm;
+            }
+            if(imm.length()>12){
+                imm = truncate(imm, 12);
             }
             rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
             while(rd.length()<5) {
@@ -149,53 +156,44 @@ public class Assembler {
         }
 
         else if(arr[0].equals("jal")) {
-            opcode = "0000101";
-            imm = Integer.toBinaryString(Integer.parseInt(arr[2]));
-            while(imm.length()<32) {
-                String temp0 = "0"+imm;
-                imm = temp0;
+            // format jal rd offset
+            opcode = "1101111";
+            offset = Integer.toBinaryString(Integer.parseInt(arr[2]));
+            while(offset.length()<21) {
+                offset = "0"+offset;
             }
-
-            String rdt = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1,arr[1].length())));
-            //System.out.println(rdt);
-            while(rdt.length()<5) {
-                String temp0 = "0"+rdt;
-                rdt = temp0;
+            if(offset.length()>21){
+                offset = truncate(offset, 21);
             }
-
-            rd = rdt;
-
-            result = imm.substring(11,12)+imm.substring(21,31)+imm.substring(20,21)+imm.substring(12,20)+rd+opcode;
+            rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
+            while(rd.length()<5) {
+                rd = "0"+rd;
+            }
+            result = offset.charAt(0)+offset.substring(10,20)+offset.charAt(9)+offset.substring(1,9)+rd+opcode;
         }
+
         else if(arr[0].equals("beq")) {
-            opcode = "0000011";
-            //System.out.println("HERE");
-            //System.out.println(Integer.toBinaryString(Integer.parseInt(arr[3])));
-            imm = Integer.toBinaryString(Integer.parseInt(arr[3]));
-            while(imm.length()<32) {
-                String temp0 = "0"+imm;
-                imm = temp0;
+            // format beq rs1 rs2 offset
+            opcode = "1100011";
+            offset = Integer.toBinaryString(Integer.parseInt(arr[3]));
+            while(offset.length()<12) {
+                offset = "0"+offset;
             }
-            String rs1t = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1,arr[1].length())));
-            //System.out.println(rdt);
-            while(rs1t.length()<5) {
-                String temp0 = "0"+rs1t;
-                rs1t = temp0;
+            if(offset.length()>12){
+                offset = truncate(offset, 12);
             }
-            //System.out.println(arr[2]);
-            String rs2t = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1,arr[2].length())));
-            //System.out.println(rs1t);
-            while(rs2t.length()<5) {
-                String temp0 = "0"+rs2t;
-                rs2t = temp0;
+            rs1 = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
+            while(rs1.length()<5) {
+                rs1 = "0"+rs1;
             }
-            //System.out.println(arr[3]);
+            rs2 = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1)));
+            while(rs2.length()<5) {
+                rs2 = "0"+rs2;
+            }
             func = "000";
-            rs1 = rs1t;
-            rs2 = rs2t;
-            result = imm.substring(19, 20)+imm.substring(21, 27)+rs2+rs1+func+imm.substring(27, 31)+imm.substring(20, 21)+opcode;
-            //result = imm.substring(20, 21)+imm.substring(22, 27)+rs2+rs1+func+imm.substring(27, 32)+imm.substring(21, 22)+opcode;
+//            result =
         }
+
         else if(arr[0].equals("bne")) {
             opcode = "0000011";
             //System.out.println("HERE");
@@ -282,188 +280,124 @@ public class Assembler {
             rs2 = rs2t;
             result = imm.substring(19, 20)+imm.substring(21, 27)+rs2+rs1+func+imm.substring(27, 31)+imm.substring(20, 21)+opcode;
         }
+
         else if(arr[0].equals("lui")) {
-            opcode = "0000100";
+            // format lui rd imm
+            opcode = "0110111";
             imm = Integer.toBinaryString(Integer.parseInt(arr[2]));
             while(imm.length()<32) {
-                String temp0 = "0"+imm;
-                imm = temp0;
+                imm = "0"+imm;
             }
-
-            String rdt = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1,arr[1].length())));
-            //System.out.println(rdt);
-            while(rdt.length()<5) {
-                String temp0 = "0"+rdt;
-                rdt = temp0;
+            rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
+            while(rd.length()<5) {
+                rd = "0"+rd;
             }
-
-            rd = rdt;
-
             result = imm.substring(0,20)+rd+opcode;
         }
+
         else if(arr[0].equals("and")) {
-            opcode = "0000000";
-            int temp = Instruction.indexOf("add");
-            //System.out.println(arr[1]);
-            String rdt = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1,arr[1].length())));
-            //System.out.println(rdt);
-            while(rdt.length()<5) {
-                String temp0 = "0"+rdt;
-                rdt = temp0;
+            // format and rd rs1 rs2
+            opcode = "0110011";
+            rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
+            while(rd.length()<5) {
+                rd = "0"+rd;
             }
-            //System.out.println(arr[2]);
-            String rs1t = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1,arr[2].length())));
-            //System.out.println(rs1t);
-            while(rs1t.length()<5) {
-                String temp0 = "0"+rs1t;
-                rs1t = temp0;
+            rs1 = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1)));
+            while(rs1.length()<5) {
+                rs1 = "0"+rs1;
             }
-            //System.out.println(arr[3]);
-            String rs2t = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1,arr[3].length())));
-            //System.out.println(rs2t);
-            while(rs2t.length()<5) {
-                String temp0 = "0"+rs2t;
-                rs2t = temp0;
+            rs2 = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1)));
+            while(rs2.length()<5) {
+                rs2 = "0"+rs2;
             }
-            func = "010";
-            rd = rdt;
-            rs1 = rs1t;
-            rs2 = rs2t;
-
+            func = "111";
             result = "0000000"+rs2+rs1+func+rd+opcode;
         }
+
         else if(arr[0].equals("or")) {
-            opcode = "0000000";
-            int temp = Instruction.indexOf("add");
-            //System.out.println(arr[1]);
-            String rdt = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1,arr[1].length())));
-            //System.out.println(rdt);
-            while(rdt.length()<5) {
-                String temp0 = "0"+rdt;
-                rdt = temp0;
+            // format or rd rs1 rs2
+            opcode = "0110011";
+            rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
+            while(rd.length()<5) {
+                rd = "0"+rd;
             }
-            //System.out.println(arr[2]);
-            String rs1t = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1,arr[2].length())));
-            //System.out.println(rs1t);
-            while(rs1t.length()<5) {
-                String temp0 = "0"+rs1t;
-                rs1t = temp0;
+            rs1 = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1)));
+            while(rs1.length()<5) {
+                rs1 = "0"+rs1;
             }
-            //System.out.println(arr[3]);
-            String rs2t = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1,arr[3].length())));
-            //System.out.println(rs2t);
-            while(rs2t.length()<5) {
-                String temp0 = "0"+rs2t;
-                rs2t = temp0;
-            }
-            func = "011";
-            rd = rdt;
-            rs1 = rs1t;
-            rs2 = rs2t;
-
-            result = "0000000"+rs2+rs1+func+rd+opcode;
-        }
-        else if(arr[0].equals("xor")) {
-            opcode = "0000000";
-            int temp = Instruction.indexOf("add");
-            //System.out.println(arr[1]);
-            String rdt = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1,arr[1].length())));
-            //System.out.println(rdt);
-            while(rdt.length()<5) {
-                String temp0 = "0"+rdt;
-                rdt = temp0;
-            }
-            //System.out.println(arr[2]);
-            String rs1t = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1,arr[2].length())));
-            //System.out.println(rs1t);
-            while(rs1t.length()<5) {
-                String temp0 = "0"+rs1t;
-                rs1t = temp0;
-            }
-            //System.out.println(arr[3]);
-            String rs2t = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1,arr[3].length())));
-            //System.out.println(rs2t);
-            while(rs2t.length()<5) {
-                String temp0 = "0"+rs2t;
-                rs2t = temp0;
-            }
-            func = "100";
-            rd = rdt;
-            rs1 = rs1t;
-            rs2 = rs2t;
-
-            result = "0000000"+rs2+rs1+func+rd+opcode;
-        }
-        else if(arr[0].equals("sll")) {
-            opcode = "0000000";
-            int temp = Instruction.indexOf("add");
-            //System.out.println(arr[1]);
-            String rdt = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1,arr[1].length())));
-            //System.out.println(rdt);
-            while(rdt.length()<5) {
-                String temp0 = "0"+rdt;
-                rdt = temp0;
-            }
-            //System.out.println(arr[2]);
-            String rs1t = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1,arr[2].length())));
-            //System.out.println(rs1t);
-            while(rs1t.length()<5) {
-                String temp0 = "0"+rs1t;
-                rs1t = temp0;
-            }
-            //System.out.println(arr[3]);
-            String rs2t = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1,arr[3].length())));
-            //System.out.println(rs2t);
-            while(rs2t.length()<5) {
-                String temp0 = "0"+rs2t;
-                rs2t = temp0;
-            }
-            func = "101";
-            rd = rdt;
-            rs1 = rs1t;
-            rs2 = rs2t;
-
-            result = "0000000"+rs2+rs1+func+rd+opcode;
-        }
-        else if(arr[0].equals("sra")) {
-            opcode = "0000000";
-            int temp = Instruction.indexOf("add");
-            //System.out.println(arr[1]);
-            String rdt = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1,arr[1].length())));
-            //System.out.println(rdt);
-            while(rdt.length()<5) {
-                String temp0 = "0"+rdt;
-                rdt = temp0;
-            }
-            //System.out.println(arr[2]);
-            String rs1t = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1,arr[2].length())));
-            //System.out.println(rs1t);
-            while(rs1t.length()<5) {
-                String temp0 = "0"+rs1t;
-                rs1t = temp0;
-            }
-            //System.out.println(arr[3]);
-            String rs2t = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1,arr[3].length())));
-            //System.out.println(rs2t);
-            while(rs2t.length()<5) {
-                String temp0 = "0"+rs2t;
-                rs2t = temp0;
+            rs2 = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1)));
+            while(rs2.length()<5) {
+                rs2 = "0"+rs2;
             }
             func = "110";
-            rd = rdt;
-            rs1 = rs1t;
-            rs2 = rs2t;
-
             result = "0000000"+rs2+rs1+func+rd+opcode;
         }
 
+        else if(arr[0].equals("xor")) {
+            // format xor rd rs1 rs2
+            opcode = "0110011";
+            rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
+            while(rd.length()<5) {
+                rd = "0"+rd;
+            }
+            rs1 = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1)));
+            while(rs1.length()<5) {
+                rs1 = "0"+rs1;
+            }
+            rs2 = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1)));
+            while(rs2.length()<5) {
+                rs2 = "0"+rs2;
+            }
+            func = "100";
+            result = "0000000"+rs2+rs1+func+rd+opcode;
+        }
+
+        else if(arr[0].equals("sll")) {
+            // format sll rd rs1 rs2
+            opcode = "0110011";
+            rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
+            while(rd.length()<5) {
+                rd = "0"+rd;
+            }
+            rs1 = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1)));
+            while(rs1.length()<5) {
+                rs1 = "0"+rs1;
+            }
+            rs2 = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1)));
+            while(rs2.length()<5) {
+                rs2 = "0"+rs2;
+            }
+            func = "001";
+            result = "0000000"+rs2+rs1+func+rd+opcode;
+        }
+
+        else if(arr[0].equals("sra")) {
+            // format sra rd rs1 rs2
+            opcode = "0110011";
+            rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
+            while(rd.length()<5) {
+                rd = "0"+rd;
+            }
+            rs1 = Integer.toBinaryString(Integer.parseInt(arr[2].substring(1)));
+            while(rs1.length()<5) {
+                rs1 = "0"+rs1;
+            }
+            rs2 = Integer.toBinaryString(Integer.parseInt(arr[3].substring(1)));
+            while(rs2.length()<5) {
+                rs2 = "0"+rs2;
+            }
+            func = "101";
+            result = "0100000"+rs2+rs1+func+rd+opcode;
+        }
         return(result);
     }
+
     public static void main(String[] args) {
         // Test
-        String Answer = assembler_binary("MyLabel: lw r17 32(r6)");
+        String Answer = assembler_binary("MyLabel: addi r17 r1 -10");
         System.out.println(Answer);
         System.out.println(Answer.length());
-        //System.out.println(Integer.toBinaryString(-10));
+        System.out.println(Integer.toBinaryString(-10));
+        System.out.println(truncate(Integer.toBinaryString(-10),10));
     }
 }
