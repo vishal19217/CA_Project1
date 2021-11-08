@@ -1,0 +1,4 @@
+lw r1 7(r0)
+loop: add r1 r1 r3
+addi r2 r2 -1
+bge r2 r0 loop

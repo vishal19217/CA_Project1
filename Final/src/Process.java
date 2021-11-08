@@ -25,16 +25,16 @@ public class Process {
         }
     }
     public static int twoComplement(String num){
-    String temp="";
-    for(int i=0;i<num.length();i++){
-        if(num.charAt(i)=='0'){
-            temp+='1';
+        String temp="";
+        for(int i=0;i<num.length();i++){
+            if(num.charAt(i)=='0'){
+                temp+='1';
+            }
+            else{
+                temp+='0';
+            }
         }
-        else{
-            temp+='0';
-        }
-    }
-    return -1*(Integer.parseInt(temp,2)+1);
+        return -1*(Integer.parseInt(temp,2)+1);
     }
     public static void updatePC(String branchTarget,Simulator s){
         int pc_val = Integer.parseInt(pc,2);
