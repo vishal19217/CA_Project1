@@ -1,0 +1,32 @@
+Code for testing:
+ 1)multiply code(r2*r3)
+
+lw r1 7(r0)
+loop: add r1 r1 r3
+addi r2 r2 -1
+bge r2 r0 loop
+
+2)xor of two register values and storing the result as well as loading it in r10
+
+xor r1 r1 r2
+sw r1 2(r3)
+lw r10 3(r6)
+
+3) jump function testing
+
+saddition: addi r2 r1 8
+jalr r0 r31 0
+addi r1 r0 12
+jal addition
+add r1 r2 r2
+
+4) addition of number from 1 to n(number is stored through addi r2 r0 number command)
+summation: add r1 r1 r2
+sub r2 r2 r3
+bge r2 r0 summation
+jalr r0 r31 0
+addi r3 r0 1 
+addi r1 r0 0
+addi r2 r0 10
+jal summation
+addi r1 r1 0

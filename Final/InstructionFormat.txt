@@ -1,0 +1,24 @@
+
+format lui rd imm
+format addi rd rs1 imm
+
+
+format add rd rs1 rs2
+format sub rd rs1 rs2
+format and rd rs1 rs2
+format or rd rs1 rs2
+format xor rd rs1 rs2
+format sll rd rs1 rs2
+format sra rd rs1 rs2
+
+format lw rd offset(rs1)
+format sw rs2 offset(rs1)
+
+
+format jalr rd rs1 offset
+format jal label->jal ra offset
+format beq rs1 rs2 label
+format bne rs1 rs2 label
+format blt rs1 rs2 label
+format bge rs1 rs2 label
+

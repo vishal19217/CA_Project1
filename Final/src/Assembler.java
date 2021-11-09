@@ -4,8 +4,10 @@ import java.util.*;
 import java.lang.*;
 import java.io.FileReader;
 public class Assembler {
+    Assembler(){
 
-    static String truncate(String str, int size){
+    }
+    String truncate(String str, int size){
         String temp = "";
         for(int i = str.length()-1 ; i>=0 ; i--){
             temp = str.charAt(i) + temp;
@@ -16,7 +18,7 @@ public class Assembler {
         return temp;
     }
 
-    static String assembler_binary(String Instruction) {
+    String assembler_binary(String Instruction) {
 
         String s1 = "MyLabel: add r1 r2 imm";
         if(Instruction.indexOf(":") != -1) {
@@ -38,7 +40,7 @@ public class Assembler {
         String result = "";
 
         if(arr[0].equals("add")){
-            // format add rd rs1 rs2
+//             format add rd rs1 rs2
             opcode = "0110011";
             rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
             while(rd.length()<5) {
@@ -162,12 +164,14 @@ public class Assembler {
             // format jal rd offset
             opcode = "1101111";
             offset = Integer.toBinaryString(Integer.parseInt(arr[2]));
+
             while(offset.length()<20) {
                 offset = "0"+offset;
             }
             if(offset.length()>20){
                 offset = truncate(offset, 20);
             }
+            System.out.println("offset after truncation:"+offset);
             rd = Integer.toBinaryString(Integer.parseInt(arr[1].substring(1)));
             while(rd.length()<5) {
                 rd = "0"+rd;
@@ -375,7 +379,7 @@ public class Assembler {
     }
 
 
-    public static void treatLabel(HashMap<String,Integer> mp,ArrayList<String> labelArr) throws IOException {
+     void treatLabel(HashMap<String,Integer> mp,ArrayList<String> labelArr) throws IOException {
         File assemblyFile = new File("C:\\Users\\HP\\IdeaProjects\\CA_Project1\\Final\\AssemblyCode.txt");
         BufferedReader br = new BufferedReader(new FileReader(assemblyFile));
         String codeLine;
@@ -400,7 +404,7 @@ public class Assembler {
 
 
     }
-    public static String check(String line,ArrayList<String> labelArr){
+    public String check(String line,ArrayList<String> labelArr){
         for(String i:labelArr){
             if(line.indexOf(i)!=-1){
 //                System.out.println(line+" --"+i);
@@ -409,7 +413,7 @@ public class Assembler {
         }
         return null;
     }
-    public static void createMachineCodeFile(){
+    public  void createMachineCodeFile(){
         try {
             File myObj = new File("C:\\Users\\HP\\IdeaProjects\\CA_Project1\\Final\\machineCode.txt");
             if (myObj.createNewFile()) {
@@ -425,7 +429,7 @@ public class Assembler {
 
 
 
-    public static void main(String[] args) throws IOException {
+    public void convertAssembly() throws IOException {
         ArrayList<String> labelArr = new ArrayList<>();
         HashMap<String,Integer> mp=new HashMap<>();
         treatLabel(mp,labelArr);
@@ -436,10 +440,11 @@ public class Assembler {
         int id = 0;
         createMachineCodeFile();
         FileWriter myWriter = new FileWriter("C:\\Users\\HP\\IdeaProjects\\CA_Project1\\Final\\machineCode.txt");
-
+            int freq=0;
         while((codeLinee=br.readLine())!=null){
-
+                freq++;
             String codeLine = codeLinee;
+//            System.out.println("loop se hu:-"+codeLine);
             String arr[] = codeLine.split(" ");
             String labelPresent = check(codeLine,labelArr);
             //if instruction contains only label but not jumps etc then simply remove label name from instruction
@@ -447,11 +452,18 @@ public class Assembler {
                 int idx = codeLine.indexOf(arr[1]);
                 codeLine = codeLine.substring(idx);
             }
-            //if the instruction is branch then simply replace the label with offset
-            else if(labelPresent!=null){
+            //if the instruction is branch only  then simply replace the label with offset
+            else if(labelPresent!=null && !arr[0].equals("jal")){
                 int offset = mp.get(labelPresent)-id;
                 codeLine = arr[0]+" "+arr[1]+" "+arr[2]+" "+Integer.toString(offset);
             }
+            //instruction is jal (jump and link) remove label name and include return register(r31) and offset in codeLine
+            else if(labelPresent!=null){
+                int offset = mp.get(labelPresent)-id;
+//                System.out.println("offset-"+offset);
+                codeLine = arr[0]+" r31 "+Integer.toString(offset);
+            }
+            System.out.println("freq:"+freq);
 
             try {
                 String Answer = assembler_binary(codeLine);

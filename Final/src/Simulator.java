@@ -34,9 +34,12 @@ public class Simulator{
     String pc,branchTarget,fhinst;
     int [] registerFile;
     String []mem;
-    Simulator(int[] registerFile,String []mem){
+    int accessTime;
+    int timeTaken,branchPC;
+    Simulator(int[] registerFile,String []mem,int accessTime){
         this.registerFile = registerFile;
         this.mem = mem;
+        this.accessTime = accessTime;
         System.out.println("Hi");
     }
     void initialise(){
@@ -73,6 +76,8 @@ public class Simulator{
         isLui = false;
 
         branchTarget = null;
+        branchPC = 0;
+        timeTaken = 5;
     }
     public void updateControlSignal(String fh_inst){
 //        System.out.println(fh_inst);
@@ -114,12 +119,14 @@ public class Simulator{
         else if(fh_inst.substring(25,30).equals("00000")){
             isOffset = true;
             isLd = true;
+            timeTaken+=(accessTime-1);
         }
 
         //store inst
         else if(fh_inst.substring(25,30).equals("01000")){
             isOffset = true;
             isSt = true;
+            timeTaken+=(accessTime-1);
         }
         //jump and link reg
         else if(fh_inst.substring(25,30).equals("11001")){
@@ -265,10 +272,15 @@ public class Simulator{
             else{
                 arr[3] = twoComplement(offset);
             }
+//            System.out.println("offset Value:-"+offset);
+//            System.out.print(arr[3]);
         }
+//        System.out.println(op1+"-"+op2+"-"+arr[2]+"-"+arr[3]);
         execute(arr);
 //        else if(inst.substring())
+
     }
+
     //contains op1,op2,immx,offset
 
     public void execute(Object[] val){
@@ -299,6 +311,7 @@ public class Simulator{
         if(isXor){
             isXor = false;
             aluResult = (int)val[0]^(int)val[1];
+//            System.out.println(aluResult);
         }
         //logical shift left
         if(isSll){
@@ -312,6 +325,7 @@ public class Simulator{
         }
         if(isBeq){
             if((int)val[0]==(int)val[1]){
+                branchPC = (int)val[3];
 //               System.out.println("operation branchequal+branchoffset:"+val[3]);
                 branchTarget = Integer.toBinaryString((int)val[3]);
             }
@@ -319,16 +333,18 @@ public class Simulator{
         if(isBne) {
             if ((int) val[0] != (int) val[1]) {
 //                System.out.println("operation branchnotequal+branchoffset:"+val[3]);
-//
+              branchPC = (int)val[3];
                 branchTarget = Integer.toBinaryString((int)val[3]);}
         }
         if(isBlt) {
             if ((int) val[0] < (int) val[1]) {
+                branchPC = (int)val[3];
 //                 System.out.println("operation branchlessthan+branchoffset:"+val[3]);
                 branchTarget = Integer.toBinaryString((int)val[3]);}
         }
         if(isBge) {
             if ((int) val[0] > (int) val[1]) {
+                branchPC = (int)val[3];
                 System.out.println("Checking for bge");
 //                 System.out.println("operation branchgreater+branchoffset:"+val[3]);
                 branchTarget = Integer.toBinaryString((int)val[3]);
@@ -336,12 +352,17 @@ public class Simulator{
         }
         if(isJal||isJalr){
             int pc_val = Integer.parseInt(pc,2);
+//            System.out.println("MEi hu:-"+pc_val);
+//            System.out.print("offset value"+val[3]);
+            branchPC = (int)val[3];
             if(isJal){
-                branchTarget = Integer.toBinaryString((int)val[3]);
+                branchTarget = Integer.toBinaryString(branchPC);
             }
             if(isJalr){
-                branchTarget = Integer.toBinaryString((int)val[0]+(int)val[3]);
+                branchPC = (int)val[0]+branchPC;
+                branchTarget = Integer.toBinaryString(branchPC);
             }
+            System.out.println("Branch Target:"+branchTarget);
 
             aluResult = (int)(pc_val+1);
         }
