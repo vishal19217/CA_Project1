@@ -1,9 +1,22 @@
-summation: add r1 r1 r2
-sub r2 r2 r3
-bge r2 r0 summation
-jalr r0 r31 0
-addi r3 r0 1 
-addi r1 r0 0
-addi r2 r0 10
-jal summation
-addi r1 r1 0
+addi r15 r16 100
+addi r1 r2 5
+addi r3 r4 4
+sw r3 0(r15)
+addi r5 r3 1
+beq r5 r1 branch_1
+add r1 r2 r3
+sub r1 r2 r3
+branch_1: sub r6 r5 r3
+addi r8 r9 2
+sra r9 r3 r8
+sll r10 r5 r6
+lw r11 100(r12)
+bne r10 r11 branch_2
+branch_2: blt r9 r10 branch_3
+branch_3: bge r5 r8 branch_4
+branch_4: jal r12 1
+lui r13 10
+and r14 r10 r11
+or r16 r15 r11
+xor r17 r16 r15
+jalr r18 r1 25

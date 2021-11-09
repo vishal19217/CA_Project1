@@ -40,7 +40,7 @@ public class Simulator{
         this.registerFile = registerFile;
         this.mem = mem;
         this.accessTime = accessTime;
-        System.out.println("Hi");
+
     }
     void initialise(){
         isSt = false;
@@ -83,7 +83,6 @@ public class Simulator{
 //        System.out.println(fh_inst);
 //        System.out.println(fh_inst.substring(25,30)+"-"+fh_inst.substring(17,20)+"-"+fh_inst.substring(0,5));
         if(fh_inst.substring(25,30).equals("01100")){
-//            System.out.println("mei hu from arithemetic operations");
             if(fh_inst.substring(17,20).equals("000")){
                 if(fh_inst.substring(0,5).equals("00000")){
                     isAdd = true;
@@ -141,7 +140,7 @@ public class Simulator{
 
         else if(fh_inst.substring(25,30).equals("11000")){
             isOffset = true;
-//            System.out.println("Branch wal bhi run kar");
+
             if(fh_inst.substring(17,20).equals("000")){
                 isBeq = true;
             }
@@ -170,7 +169,7 @@ public class Simulator{
 
         updateControlSignal(fh_inst);
 //        System.out.println("Instruction:-"+fh_inst);
-//        System.out.println(isBge);
+
         decode(fh_inst);
 
     }
@@ -272,12 +271,11 @@ public class Simulator{
             else{
                 arr[3] = twoComplement(offset);
             }
-//            System.out.println("offset Value:-"+offset);
-//            System.out.print(arr[3]);
+
         }
 //        System.out.println(op1+"-"+op2+"-"+arr[2]+"-"+arr[3]);
         execute(arr);
-//        else if(inst.substring())
+
 
     }
 
@@ -404,7 +402,7 @@ public class Simulator{
     }
 
     public void writeBack(Object ans){
-        //writing args=1
+
         if(ans!=null) {
             String adr = fhinst.substring(20, 25);
             int idx = Integer.parseInt(adr, 2);

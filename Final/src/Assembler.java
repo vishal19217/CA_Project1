@@ -4,9 +4,7 @@ import java.util.*;
 import java.lang.*;
 import java.io.FileReader;
 public class Assembler {
-    Assembler(){
 
-    }
     String truncate(String str, int size){
         String temp = "";
         for(int i = str.length()-1 ; i>=0 ; i--){
@@ -389,16 +387,12 @@ public class Assembler {
         while((codeLine=br.readLine())!=null){
 //            System.out.println(codeLine);
             String arr[] = codeLine.split(" ");
-//            Instruction.indexOf(":") != -1
             if(arr[0].indexOf(":")!=-1){
                 int len = arr[0].length();
                 labelArr.add(arr[0].substring(0,len-1));
                 mp.put(arr[0].substring(0,len-1),id);
             }
             id++;
-        }
-        for(String i:labelArr){
-//            System.out.println(i);
         }
 
 
@@ -407,7 +401,6 @@ public class Assembler {
     public String check(String line,ArrayList<String> labelArr){
         for(String i:labelArr){
             if(line.indexOf(i)!=-1){
-//                System.out.println(line+" --"+i);
                 return i;
             }
         }
@@ -440,21 +433,23 @@ public class Assembler {
         int id = 0;
         createMachineCodeFile();
         FileWriter myWriter = new FileWriter("C:\\Users\\HP\\IdeaProjects\\CA_Project1\\Final\\machineCode.txt");
-            int freq=0;
+
         while((codeLinee=br.readLine())!=null){
-                freq++;
             String codeLine = codeLinee;
-//            System.out.println("loop se hu:-"+codeLine);
             String arr[] = codeLine.split(" ");
             String labelPresent = check(codeLine,labelArr);
-            //if instruction contains only label but not jumps etc then simply remove label name from instruction
+            //if instruction contains label but not jumps etc then simply remove label name from instruction
             if(labelPresent!=null && codeLine.indexOf(":")!=-1){
                 int idx = codeLine.indexOf(arr[1]);
                 codeLine = codeLine.substring(idx);
             }
-            //if the instruction is branch only  then simply replace the label with offset
-            else if(labelPresent!=null && !arr[0].equals("jal")){
+            arr = codeLine.split(" ");
+            labelPresent = check(codeLine,labelArr);
+
+            //if the instruction is branch then simply replace the label with offset
+            if(labelPresent!=null && !arr[0].equals("jal")){
                 int offset = mp.get(labelPresent)-id;
+
                 codeLine = arr[0]+" "+arr[1]+" "+arr[2]+" "+Integer.toString(offset);
             }
             //instruction is jal (jump and link) remove label name and include return register(r31) and offset in codeLine
@@ -463,8 +458,8 @@ public class Assembler {
 //                System.out.println("offset-"+offset);
                 codeLine = arr[0]+" r31 "+Integer.toString(offset);
             }
-            System.out.println("freq:"+freq);
 
+//            System.out.println(labelPresent);
             try {
                 String Answer = assembler_binary(codeLine);
                 System.out.println(Answer);

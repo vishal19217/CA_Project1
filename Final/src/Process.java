@@ -22,13 +22,16 @@ public class Process {
         System.out.println("Time Taken by the instruction :-"+timeTaken);
     }
     public static  void dumpRF(int registerFile[]){
-        System.out.println("Status of Register File");
+        System.out.println("Status of Register File:");
         for(int i=0;i<32;i++){
             System.out.println("R"+i+":"+registerFile[i]);
         }
     }
     public static void dumpMem(){
-
+        System.out.println("Memory Status:");
+        for(int i=0;i<mem.length;i++){
+            System.out.println(mem[i]);
+        }
     }
     public static int twoComplement(String num){
         String temp="";
@@ -46,13 +49,7 @@ public class Process {
         int pc_val = Integer.parseInt(pc,2);
 
         if(s.branchPC!=0){
-//            int bt;
-//
-//            if(branchTarget.charAt(0)=='1')
-//                bt = twoComplement(branchTarget);
-//            else
-//                bt = Integer.parseInt(branchTarget,2);
-//            System.out.println("Branch Target VAlue"+branchTarget);
+
             pc_val = pc_val+ s.branchPC;
             pc = Integer.toBinaryString(pc_val);
 
@@ -96,21 +93,18 @@ public class Process {
         int at = sc.nextInt();
         assembler.convertAssembly();//converting assembly to binary
         storeInstructions(mem);
-//        mem[7] = "00000000000000000000000000000000";//data stored at mem[7] = 0
-        pc = Integer.toBinaryString(4);
+
+        pc = Integer.toBinaryString(0);
         Simulator s = new Simulator(registerFile,mem,at);
         registerFile[0] = 0;
-//        registerFile[1] = 5;  //rd
-//        registerFile[2] = 27; //rs1
-//        registerFile[3] = 5; //rs2
-//        registerFile[6] = 4;
+
 
         while(mem[Integer.parseInt(pc,2)]!=null){
             System.out.println(mem[Integer.parseInt(pc,2)]);
             s.initialise();
-//            dumpRF(registerFile);
+            dumpRF(registerFile);
             s.fetch(pc);
-//            dumpRF(registerFile);
+            dumpRF(registerFile);
             dumpPC();
             dumpTiming(s.timeTaken);
             updatePC(s.branchTarget,s);
@@ -119,9 +113,9 @@ public class Process {
 
         }
         dumpMem();
-        System.out.println(registerFile[2]);
-        System.out.println(registerFile[1]);
-        System.out.println(registerFile[31]);
+//        System.out.println(registerFile[2]);
+//        System.out.println(registerFile[1]);
+//        System.out.println(registerFile[31]);
     }
 }
 //Assumptions:- ra ->r31
