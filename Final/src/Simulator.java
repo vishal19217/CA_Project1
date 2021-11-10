@@ -341,7 +341,7 @@ public class Simulator{
                 branchTarget = Integer.toBinaryString((int)val[3]);}
         }
         if(isBge) {
-            if ((int) val[0] > (int) val[1]) {
+            if ((int) val[0] >= (int) val[1]) {
                 branchPC = (int)val[3];
                 System.out.println("Checking for bge");
 //                 System.out.println("operation branchgreater+branchoffset:"+val[3]);

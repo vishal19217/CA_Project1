@@ -27,6 +27,8 @@ public class Process {
             System.out.println("R"+i+":"+registerFile[i]);
         }
     }
+
+
     public static void dumpMem(){
         System.out.println("Memory Status:");
         for(int i=0;i<mem.length;i++){
