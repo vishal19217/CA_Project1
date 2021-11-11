@@ -6,6 +6,7 @@ public class Process {
     //register r1 stores the return address
     //Control signals
     static String pc=null;
+    static int totalTime=0;
     static String []mem;
     static int [] registerFile = new int[32];
     public static void MemInitialise(int memCap){
@@ -16,10 +17,11 @@ public class Process {
     }
 
     public static void dumpPC(){
-        System.out.println("Address stored in PC:"+pc);
+        System.out.println("Current Address stored in PC:"+pc);
     }
     public static void dumpTiming(int timeTaken){
-        System.out.println("Time Taken by the instruction :-"+timeTaken);
+        totalTime+=timeTaken;
+        System.out.println("Time Taken by the current instruction(in cycles):-"+timeTaken);
     }
     public static  void dumpRF(int registerFile[]){
         System.out.println("Status of Register File:");
@@ -32,7 +34,7 @@ public class Process {
     public static void dumpMem(){
         System.out.println("Memory Status:");
         for(int i=0;i<mem.length;i++){
-            System.out.println(mem[i]);
+            System.out.println("Memory Location("+i+"):"+mem[i]);
         }
     }
     public static int twoComplement(String num){
@@ -79,6 +81,12 @@ public class Process {
         }
     }
     public static void main(String[] args) throws IOException {
+        //Assumptions:- ra ->r31
+        //no concurrent data and instruction at a memory location
+        //first load the instructions in memory
+        //each instruction will be processed after previous inst completes it's 5-stage pipeline
+
+
         Assembler assembler = new Assembler();
         Scanner sc = new Scanner(System.in);
         System.out.println("Do you want to provide the size of Main Memory press 1 for yes else 2 for no");
@@ -91,33 +99,27 @@ public class Process {
         else {
             MemInitialise();
         }
-        System.out.println("Enter the Access Time for Memory Operations:-");
+        System.out.println("Enter the Access Time(in cycles where 1 access time = 1 cycle) for Memory Operations:-");
         int at = sc.nextInt();
         assembler.convertAssembly();//converting assembly to binary
         storeInstructions(mem);
 
         pc = Integer.toBinaryString(0);
         Simulator s = new Simulator(registerFile,mem,at);
-        registerFile[0] = 0;
-
 
         while(mem[Integer.parseInt(pc,2)]!=null){
-            System.out.println(mem[Integer.parseInt(pc,2)]);
             s.initialise();
-            dumpRF(registerFile);
             s.fetch(pc);
             dumpRF(registerFile);
             dumpPC();
             dumpTiming(s.timeTaken);
             updatePC(s.branchTarget,s);
-            System.out.println("new PC:"+pc);
+            System.out.println("new PC value:-"+pc);
 
 
         }
+        System.out.println("TotalTimeTaken(in Cycles):"+totalTime);
         dumpMem();
-//        System.out.println(registerFile[2]);
-//        System.out.println(registerFile[1]);
-//        System.out.println(registerFile[31]);
     }
 }
 //Assumptions:- ra ->r31
