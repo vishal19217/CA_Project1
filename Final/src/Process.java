@@ -106,20 +106,23 @@ public class Process {
 
         pc = Integer.toBinaryString(0);
         Simulator s = new Simulator(registerFile,mem,at);
-
+        Cache cache = new SetAssociative(4,4,mem);
+        s.cache = cache;
         while(mem[Integer.parseInt(pc,2)]!=null){
             s.initialise();
             s.fetch(pc);
-            dumpRF(registerFile);
-            dumpPC();
-            dumpTiming(s.timeTaken);
+//            dumpRF(registerFile);
+//            dumpPC();
+//            dumpTiming(s.timeTaken);
             updatePC(s.branchTarget,s);
-            System.out.println("new PC value:-"+pc);
+//            System.out.println("new PC value:-"+pc);
 
 
         }
-        System.out.println("TotalTimeTaken(in Cycles):"+totalTime);
-        dumpMem();
+//        System.out.println("TotalTimeTaken(in Cycles):"+totalTime);
+//        dumpMem();
+        cache.print();
+
     }
 }
 //Assumptions:- ra ->r31

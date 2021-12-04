@@ -36,6 +36,7 @@ public class Simulator{
     String []mem;
     int accessTime;
     int timeTaken,branchPC;
+    public Cache cache;
     Simulator(int[] registerFile,String []mem,int accessTime){
         this.registerFile = registerFile;
         this.mem = mem;
@@ -387,13 +388,19 @@ public class Simulator{
             writeBack(res);
         }
         else if(isSt){
+            System.out.println("Data:"+val[1]);
             String store = Integer.toBinaryString((int)val[1]);
+            String add = Integer.toBinaryString((int)res);
+            add = "0".repeat(32-add.length())+add;
             if(store.length()<32){
                 int l = store.length();
                 for(int i=0;i<32-l;i++){
                     store = "0"+store;
+
                 }
             }
+            System.out.println("Data:"+store);
+            cache.insert(add,store);
             mem[(int)res] = store;
         }
         else{

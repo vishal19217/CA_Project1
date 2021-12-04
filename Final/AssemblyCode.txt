@@ -1,15 +1,7 @@
-addi r1 r1 2047
-sw r1 17(r0)
-addi r2 r2 2
-loop: lw r3 17(r0)
-jal mod
-beq r3 r0 notprime
-addi r2 r2 1
-blt r2 r1 loop
-addi r0 r0 1
-beq r10 r10 exit
-mod: sub r3 r3 r2
-bge r3 r2 mod
-jalr r5 r31 0
-notprime: addi r0 r0 0
-exit: addi r5 r5 5
+addi r1 r1 50
+sw r1 4(r0)
+addi r3 r3 5
+sw r3 11(r0)
+addi r2 r2 8
+add r1 r3 r3
+sw r2 9(r0)
