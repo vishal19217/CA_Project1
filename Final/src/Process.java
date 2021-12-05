@@ -106,8 +106,9 @@ public class Process {
 
         pc = Integer.toBinaryString(0);
         Simulator s = new Simulator(registerFile,mem,at);
-        Cache cache = new SetAssociative(4,4,mem);
+        Cache cache = new SetAssociative(4,4,mem,1);
         s.cache = cache;
+//        cache.print();
         while(mem[Integer.parseInt(pc,2)]!=null){
             s.initialise();
             s.fetch(pc);
@@ -120,8 +121,9 @@ public class Process {
 
         }
 //        System.out.println("TotalTimeTaken(in Cycles):"+totalTime);
-//        dumpMem();
+        dumpMem();
         cache.print();
+
 
     }
 }

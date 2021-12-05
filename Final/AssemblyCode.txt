@@ -1,7 +1,6 @@
-addi r1 r1 50
-sw r1 4(r0)
+addi r1 r1 10
+sw r1 20(r0)
 addi r3 r3 5
-sw r3 11(r0)
+sw r3 25(r0)
 addi r2 r2 8
-add r1 r3 r3
-sw r2 9(r0)
+sw r2 30(r0)

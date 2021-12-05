@@ -201,6 +201,8 @@ public class Simulator{
         op2 = (Integer)registerFile[op2];
         arr[0] = op1;
         arr[1] = op2;
+
+//        System.out.println(op1+":"+op2);
         if(isBlt||isBeq||isBne||isBge){
             String offset = inst.substring(0,1)+inst.substring(24,25)+inst.substring(1,7)+inst.substring(20,24);
             if(offset.substring(0,1).equals("0")){
@@ -388,7 +390,7 @@ public class Simulator{
             writeBack(res);
         }
         else if(isSt){
-            System.out.println("Data:"+val[1]);
+//            System.out.println("Data:"+val[1]);
             String store = Integer.toBinaryString((int)val[1]);
             String add = Integer.toBinaryString((int)res);
             add = "0".repeat(32-add.length())+add;
@@ -399,8 +401,8 @@ public class Simulator{
 
                 }
             }
-            System.out.println("Data:"+store);
-            cache.insert(add,store);
+//            System.out.println("Data:"+store);
+            cache.write(add,store);
             mem[(int)res] = store;
         }
         else{
