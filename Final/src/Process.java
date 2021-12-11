@@ -106,7 +106,20 @@ public class Process {
 
         pc = Integer.toBinaryString(0);
         Simulator s = new Simulator(registerFile,mem,at);
-        Cache cache = new SetAssociative(4,4,mem,1);
+        System.out.println("Enter the choice 1)For Direct Map 2)For Set Associative 3) For Fully Associative");
+        ch = sc.nextInt();
+        Cache cache;
+        //writeBack = 2 writeThrough = 1
+        if(ch==2){
+            cache = new SetAssociative(4,4,mem,2,1);
+        }
+        else if(ch==1){
+            cache = new DirectMapped(4,4,mem,2,1);
+        }
+        else{
+            cache = new FullyAssociative(4,4,mem,2,1);
+        }
+
         s.cache = cache;
 //        cache.print();
         while(mem[Integer.parseInt(pc,2)]!=null){
@@ -122,6 +135,7 @@ public class Process {
         }
 //        System.out.println("TotalTimeTaken(in Cycles):"+totalTime);
         dumpMem();
+        dumpRF(registerFile);
         cache.print();
 
 

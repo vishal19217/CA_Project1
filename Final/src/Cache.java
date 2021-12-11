@@ -9,8 +9,10 @@ public abstract class Cache {
     String dataArray[][];
     int writePolicy;
     int counterArray[];
-    Cache(int size,int blockSize,String mem[],int writePolicy){
+    int replacePolicy;
+    Cache(int size,int blockSize,String mem[],int writePolicy,int replacePolicy){
         this.size = size;
+        this.replacePolicy = replacePolicy;
         this.writePolicy = writePolicy;
         this.mem = mem;
         this.blockSize = blockSize;
@@ -29,6 +31,16 @@ public abstract class Cache {
     public abstract void print();
     public abstract String read(String addr);
     public abstract void evict(String addr);
+    public void updateCounterArray(int blockPos){
+
+        for(int i=0;i<size;i++){
+            counterArray[i]+=1;
+        }
+        counterArray[blockPos] = 0;
+    }
+    public void updateFIFO(int blockPos){
+
+    }
 }
 
 

@@ -383,8 +383,10 @@ public class Simulator{
     public void memory(Object []val,Object res){
         if(isLd||isLui){
             if(isLd) {
-                String ldResult = mem[(Integer) res];
-                res = Integer.parseInt(ldResult, 2);
+                String add = Integer.toBinaryString((int)res);
+                add = "0".repeat(32-add.length())+add;
+                String ldResult = cache.read(add);
+                res = Integer.parseInt(ldResult,2);
             }
 
             writeBack(res);
@@ -403,7 +405,7 @@ public class Simulator{
             }
 //            System.out.println("Data:"+store);
             cache.write(add,store);
-            mem[(int)res] = store;
+//            mem[(int)res] = store;
         }
         else{
             writeBack(res);
