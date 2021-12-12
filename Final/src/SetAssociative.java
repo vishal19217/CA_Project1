@@ -5,9 +5,6 @@ import java.util.Scanner;
 
 public class SetAssociative extends Cache {
 
-//    int size,missPenalty,hitTime,blockSize;
-//    String tagArray[];
-
 //    int dataArray[][];
     int offset,k,tagsize,set_index;
     int associativity;
@@ -22,11 +19,10 @@ public class SetAssociative extends Cache {
         set_index = (int) (Math.log(size/k)/Math.log(2));
         tagsize = 32-set_index-offset;
         tagArray = new String[size];
-        setQueue = new Queue[k];
-        System.out.println("Number of Cache lines:-"+size);
-        System.out.println(tagsize+"-"+set_index+"-"+offset);
-//        dataArray = new String[][][size][blockSize];
-        for(int i=0;i<k;i++){
+        setQueue = new Queue[size/k];
+//        System.out.println("Number of Cache lines:-"+size);
+//        System.out.println(tagsize+"-"+set_index+"-"+offset);
+        for(int i=0;i<(size/k);i++){
             setQueue[i] = new LinkedList<>();
         }
     }
@@ -85,6 +81,7 @@ public class SetAssociative extends Cache {
 //        System.out.println("setNumber:-"+setNum+":data Location:-"+dataLoc);
 
         //First Checking the cache hit
+
         for(int i=0;i<k;i++){
 //            System.out.println(tag);
 //            System.out.println(tagArray[setNum*k+i]);
@@ -96,6 +93,7 @@ public class SetAssociative extends Cache {
             }
             if(f==1)break;
         }
+
         //cache miss
         if(f==0){
             //check if the set has empty slots
@@ -112,6 +110,8 @@ public class SetAssociative extends Cache {
                 evict(address);
                 blockPos = insert(address);
             }
+            isMiss = true;
+            totalMiss++;
         }
         dataArray[blockPos][dataLoc] = data;
        //writePolicy = 1 (writeThrough) else writeBack
@@ -130,7 +130,8 @@ public class SetAssociative extends Cache {
         //FIFO update FIFO in case of cache miss only
         else if(replacePolicy==2 && f==0){
 //            System.out.println("new Occupied"+blockPos);
-//            System.out
+//            System.out.println(setNum+"k value:"+k);
+//            System.out.println(setQueue.length);
             setQueue[setNum].add(blockPos);
 //            updateFIFO(blockPos);
         }
@@ -176,7 +177,9 @@ public class SetAssociative extends Cache {
                     break;
                 }
             }
-            //if empty slots present
+            isMiss=true;
+            totalMiss++;
+        //if empty slots present
             if(f==1){
                 blockPos = insert(address);
 
@@ -238,7 +241,7 @@ public class SetAssociative extends Cache {
             if(random==k){
                 random = k-1;
             }
-            System.out.println("Random:"+random);
+//            System.out.println("Random:"+random);
 
             blockPos = random+setNum*k;
         }
@@ -259,7 +262,7 @@ public class SetAssociative extends Cache {
             dataArray[blockPos][i] = null;
         }
         tagArray[blockPos] = null;
-        System.out.println("REmoved  cacheline:"+blockPos);
+//        System.out.println("REmoved  cacheline:"+blockPos);
 
     }
 

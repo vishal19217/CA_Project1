@@ -110,7 +110,7 @@ public class Process {
 
         Assembler assembler = new Assembler();
         Scanner sc = new Scanner(System.in);
-        System.out.println("Do you want to provide the size of Main Memory press 1 for yes else 2 for no");
+        System.out.println("If you want to provide the size of Main Memory press 1 for yes else 2 for no(Default size=256)");
         int ch = sc.nextInt();
         if(ch==1){
             System.out.println("Input the size of Main Memory (each location is 32bit):-");
@@ -120,27 +120,58 @@ public class Process {
         else {
             MemInitialise();
         }
-        System.out.println("Enter the Access Time(in cycles where 1 access time = 1 cycle) for Memory Operations:-");
-        int at = sc.nextInt();
-        Simulator s = new Simulator(registerFile,mem,at);
-        System.out.println("Enter the choice 1)For Direct Map 2)For Set Associative 3) For Fully Associative");
+        System.out.println("Enter the Access Time for main Memory(in cycles where 1 access time = 1 cycle) for Memory Operations:-");
+        int accessTime = sc.nextInt();
+        Simulator s = new Simulator(registerFile,mem,accessTime);
+        System.out.println("If you want system with cache press 1 else 2");
         ch = sc.nextInt();
-        isCacheUsed = true;
-        s.isCacheUsed = true;
-        //writeBack = 2 writeThrough = 1
-        int replacePolicy = 3,writePolicy = 2;
-        if(ch==2){
-            cache = new SetAssociative(12,4,mem,writePolicy,replacePolicy);
-        }
-        else if(ch==1){
-            cache = new DirectMapped(12,4,mem,writePolicy,replacePolicy);
-        }
-        else{
-            cache = new FullyAssociative(12,4,mem,writePolicy,replacePolicy);
-        }
+        if(ch==1){
+            System.out.println("Enter the choice 1)For Direct Map 2)For Set Associative 3) For Fully Associative");
+            ch = sc.nextInt();
+            isCacheUsed = true;
+            s.isCacheUsed = true;
+            int replacePolicy = 2,writePolicy = 1,size=8,blockSize=4,hitTime=2,missPenalty=2;
 
-        s.cache = cache;
+            System.out.println("Enter the Size of cache(no. of cachelines):");
+            size = sc.nextInt();
+            System.out.println("Enter the Block Size");
+            blockSize = sc.nextInt();
+            System.out.println("Enter Hit Time");
+            hitTime = sc.nextInt();
+            System.out.println("Enter Miss Penalty");
+            missPenalty = sc.nextInt();
+            System.out.println(" Replacement Policy  Choice\n LRU                1\n FIFO               2\n Random             3\n");
+            replacePolicy = sc.nextInt();
+            System.out.println("Write Policy  Choice\n" +
+                    "  WriteThrough   1\n" +
+                    "  WriteBack      2");
+            writePolicy = sc.nextInt();
+            /*
+            Replacement Policy  Choice
+                LRU                1
+                FIFO               2
+                Random             3
+         */
+        /*
+            Write Policy  Choice
+              WriteThrough   1
+              WriteBack      2
+         */
+            if(ch==2){
+                cache = new SetAssociative(size,blockSize,mem,writePolicy,replacePolicy);
+            }
+            else if(ch==1){
+                cache = new DirectMapped(size,blockSize,mem,writePolicy,replacePolicy);
+            }
+            else{
+                cache = new FullyAssociative(size,blockSize,mem,writePolicy,replacePolicy);
+            }
+            s.cache = cache;
+            cache.hitTime = hitTime;
+            cache.missPenalty = missPenalty;
+            cache.accessTime = accessTime;
 
+        }
 
 
 
@@ -150,23 +181,27 @@ public class Process {
         storeInstructions(mem);
 
         pc = Integer.toBinaryString(0);
-
-//        cache.print();
+        int id=0;
+        cache.updateTime();
         while(mem[Integer.parseInt(pc,2)]!=null){
             s.initialise();
             s.fetch(pc);
-//            dumpRF(registerFile);
-//            dumpPC();
-//            dumpTiming(s.timeTaken);
+            dumpRF(registerFile);
+            dumpPC();
+            dumpTiming(s.timeTaken);
             updatePC(s.branchTarget,s);
 //            System.out.println("new PC value:-"+pc);
 
-
+            id++;
         }
-//        System.out.println("TotalTimeTaken(in Cycles):"+totalTime);
+        System.out.println("TotalTimeTaken(in Cycles):"+totalTime);
+
         dumpMem();
         dumpRF(registerFile);
-        cache.print();
+        if(isCacheUsed)
+            System.out.println("Total Misses in cache:"+cache.totalMiss);
+            System.out.println("Cache Miss Rate:"+(cache.totalMiss*1.0)/id);
+            cache.print();
 
 
     }

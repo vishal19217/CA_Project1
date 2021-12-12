@@ -81,7 +81,7 @@ public class Simulator{
 
         branchTarget = null;
         branchPC = 0;
-        timeTaken = 5;
+        timeTaken = 0;
     }
     public void updateControlSignal(String fh_inst){
 //        System.out.println(fh_inst);
@@ -166,18 +166,20 @@ public class Simulator{
     }
     public  void fetch(String pc){
         this.pc = pc;
-
         if(isCacheUsed){
             pc = "0".repeat(32-pc.length())+pc;
             String fh_inst = cache.read(pc);
-            System.out.println("Instrution:"+fh_inst);
+
             updateControlSignal(fh_inst);
+            timeTaken+= cache.updateTime();
+//            System.out.println("Instrution:"+fh_inst);
+
             fhinst = fh_inst;
 //        System.out.println("Instruction:-"+fh_inst);
             decode(fh_inst);
         }
         else{
-
+            timeTaken +=accessTime;
             int adr = Integer.parseInt(pc,2);
             String fh_inst = mem[adr];
             fhinst = fh_inst;
@@ -203,6 +205,7 @@ public class Simulator{
         return -1*(Integer.parseInt(temp,2)+1);
     }
     public void decode(String inst){
+        timeTaken+=1;
         //tasks: calculating the value of immediate,read the src registers
 
         //Immediate Operands Decode
@@ -301,6 +304,7 @@ public class Simulator{
     //contains op1,op2,immx,offset
 
     public void execute(Object[] val){
+        timeTaken+=1;
         Object aluResult=null;
 //        System.out.println(val[0]+":"+val[1]);
         //add
@@ -401,9 +405,20 @@ public class Simulator{
             if(isLd) {
                 String add = Integer.toBinaryString((int)res);
                 add = "0".repeat(32-add.length())+add;
-                String ldResult = cache.read(add);
+                String ldResult;
+                if(isCacheUsed){
+                    ldResult = cache.read(add);
+                    timeTaken+= cache.updateTime();
+                }
+                else{
+                    ldResult = mem[Integer.parseInt(add,2)];
+                    timeTaken+=accessTime;
+                }
 
                 res = Integer.parseInt(ldResult,2);
+            }
+            else{
+                timeTaken+=1;
             }
 
             writeBack(res);
@@ -421,16 +436,24 @@ public class Simulator{
                 }
             }
 //            System.out.println("Data:"+store);
-            cache.write(add,store);
-//            mem[(int)res] = store;
+            if(isCacheUsed){
+                cache.write(add,store);
+                timeTaken+=cache.updateTime();
+            }
+            else{
+                mem[(int)res] = store;
+                timeTaken+=accessTime;
+            }
+            writeBack(null);
         }
         else{
+            timeTaken+=1;
             writeBack(res);
         }
     }
 
     public void writeBack(Object ans){
-
+        timeTaken+=1;
         if(ans!=null) {
             String adr = fhinst.substring(20, 25);
             int idx = Integer.parseInt(adr, 2);

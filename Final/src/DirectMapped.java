@@ -37,8 +37,11 @@ public class DirectMapped extends Cache{
         int dataLoc = Integer.parseInt(dataLocBin, 2);
         int idxInt = Integer.parseInt(idxBin, 2);
         //checking if the cache slot empty
+        cyclesTaken = hitTime;
+        int f1=0;
         if(tagArray[idxInt] == null){
             insert(address);
+            f1=1;
             dataArray[idxInt][dataLoc] = data;
 
         }else if(tagArray[idxInt].substring(2).equals(tag)){ // cache hit
@@ -46,7 +49,12 @@ public class DirectMapped extends Cache{
         }else{ // cache miss
             evict(address);
             insert(address);
+            f1=1;
             dataArray[idxInt][dataLoc] = data;
+        }
+        if(f1==1){
+            isMiss = true;
+            totalMiss+=1;
         }
         if(writePolicy == 1){ // write policy is write through
             mem[Integer.parseInt(address, 2)] = data;
@@ -79,16 +87,21 @@ public class DirectMapped extends Cache{
         String dataLocBin = address.substring(tagSize+index, 32);
         int dataLoc = Integer.parseInt(dataLocBin, 2);
         int idxInt = Integer.parseInt(idxBin, 2);
-
+        cyclesTaken = hitTime;
         //empty space at idxInt
         if(tagArray[idxInt] == null){
             insert(address);
+            isMiss = true;
+            totalMiss+=1;
             return dataArray[idxInt][dataLoc];
         }
         else if(tagArray[idxInt].substring(2).equals(tag)){ // cache hit
             return dataArray[idxInt][dataLoc];
         }
+        isMiss = true;
+        totalMiss++;
         evict(address); // cache miss
+
         insert(address);
         return dataArray[idxInt][dataLoc];
     }
@@ -102,7 +115,7 @@ public class DirectMapped extends Cache{
         String zeros = "0".repeat(offset);
         loc = loc + zeros;
         int startIdx = Integer.parseInt(loc, 2); // start index for a block
-        System.out.println("Eviction:"+startIdx);
+//        System.out.println("Eviction:"+startIdx);
         if(writePolicy != 1){ // write policy is write through
             for(int i = 0 ; i<blockSize ; i++){
                 mem[startIdx+i] = dataArray[idxInt][i];

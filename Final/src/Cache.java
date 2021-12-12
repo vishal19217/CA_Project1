@@ -7,10 +7,12 @@ public abstract class Cache {
     here word addressable so 1 block location is 1 word
 
      */
-    int size,missPenalty,hitTime,blockSize;
+    int size,missPenalty,hitTime,blockSize,accessTime,totalMiss=0,cyclesTaken=0;
+    boolean isMiss = false;
     String tagArray[];
     String mem[];
     String dataArray[][];
+//    boolean isMiss=false; //it will update after every instruction in memory access stages(Fetch,Memory)
     int writePolicy;
     int counterArray[];
     int replacePolicy;
@@ -50,9 +52,18 @@ public abstract class Cache {
     public void updateRandom(){
 
     }
-//    public void updateReplacement(int blockPos,boolean isInsert){
-//
-//    }
+    public int updateTime(){
+        if(isMiss){
+            cyclesTaken = hitTime+missPenalty+accessTime;
+        }
+        else{
+            cyclesTaken = hitTime;
+        }
+//        System.out.println(isMiss+"-"+cyclesTaken);
+        isMiss = false;
+        return cyclesTaken;
+
+    }
 }
 
 
