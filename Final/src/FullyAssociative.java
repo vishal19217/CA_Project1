@@ -79,8 +79,8 @@ import java.util.*;
             if(replacePolicy==1){
                 updateCounterArray(blockPos);
             }
-            //FIFO
-            else if(replacePolicy==2){
+            //FIFO update FIFO in case of cache miss only
+            else if(replacePolicy==2 && done==0){
                 updateFIFO(blockPos);
             }
 
@@ -89,13 +89,6 @@ import java.util.*;
 
         @Override
         public void evict(String address){
-            String tag = address.substring(0, tagSize);
-            //String idxBin = address.substring(tagSize, tagSize+index); // index in binary
-            //int idxInt = Integer.parseInt(idxBin, 2);
-            String loc = tag;
-            String zeros = "0".repeat(offset);
-            loc = loc + zeros;
-            int startIdx = Integer.parseInt(loc, 2); // start index for a block
             //LRU
             int blockPos = -1;
             if(replacePolicy==1){
@@ -107,19 +100,27 @@ import java.util.*;
                     }
                 }
             }
+            //FIFO
             else if(replacePolicy==2){
-
+                blockPos = queue.peek();
+                queue.poll();
             }
+            //Random
             else{
-
+                blockPos = (int)Math.round((Math.random()*(size)));
+                if(blockPos==size){
+                    blockPos--;
+                }
+                System.out.println("Remove:"+blockPos);
             }
-            if(writePolicy!=1){
-
-            }
+            String loc = tagArray[blockPos].substring(2);
+            String zeros = "0".repeat(offset);
+            loc = loc + zeros;
+            int startIdx = Integer.parseInt(loc, 2); // start index for a block
 
             for(int i=0;i<blockSize;i++){
                 //writeBack
-                if(tagArray[blockPos].substring(1,2).equals("1")&&writePolicy!=1){
+                if(tagArray[blockPos].substring(1,2).equals("1")&&writePolicy==2){
                     mem[startIdx+i] = dataArray[blockPos][i];
                 }
 
@@ -142,12 +143,14 @@ import java.util.*;
 //          System.out.println(tagArray[0].substring(2,tagSize));
             for(int i = 0;i<size;i++) {
                 if(tagArray[i]!=null && tagArray[i].substring(2).equals(tag)){ // cache hit
-
+                    if(replacePolicy==1){
+                        updateCounterArray(i);
+                    }
                     return(dataArray[i][dataLoc]);
                 }
             }
 //            Cache Miss
-            int f=1;
+            int f=0;
             //checking if empty slots
             int blockPos= -1;
             for(int i=0;i<size;i++){
@@ -167,7 +170,14 @@ import java.util.*;
                 evict(address);
                 blockPos = insert(address);
             }
-
+            //LRU
+            if(replacePolicy==1){
+                updateCounterArray(blockPos);
+            }
+            //FIFO block added in FIFO only in case of cache miss
+            else if(replacePolicy==2){
+                updateFIFO(blockPos);
+            }
             System.out.println("data:"+dataArray[blockPos][dataLoc]);
             return dataArray[blockPos][dataLoc];
         }

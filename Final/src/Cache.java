@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public abstract class Cache {
     /*
     here word addressable so 1 block location is 1 word
@@ -10,6 +14,7 @@ public abstract class Cache {
     int writePolicy;
     int counterArray[];
     int replacePolicy;
+    Queue<Integer>queue;
     Cache(int size,int blockSize,String mem[],int writePolicy,int replacePolicy){
         this.size = size;
         this.replacePolicy = replacePolicy;
@@ -19,6 +24,7 @@ public abstract class Cache {
         tagArray = new String[size];
         counterArray = new int[size];
         dataArray = new String[size][blockSize];
+        queue = new LinkedList<Integer>();
         for(int i=0;i<size;i++){
             counterArray[i] = 1;
         }
@@ -39,11 +45,14 @@ public abstract class Cache {
         counterArray[blockPos] = 0;
     }
     public void updateFIFO(int blockPos){
-
+        queue.add(blockPos);
     }
     public void updateRandom(){
 
     }
+//    public void updateReplacement(int blockPos,boolean isInsert){
+//
+//    }
 }
 
 

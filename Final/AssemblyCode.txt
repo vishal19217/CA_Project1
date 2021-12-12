@@ -15,3 +15,5 @@ sw r15 55(r0)
 lw r9 55(r0)
 addi r18 r18 20
 sw r18 45(r0)
+addi r19 r19 6
+sw r19 25(r0)

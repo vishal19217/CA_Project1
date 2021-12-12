@@ -110,14 +110,15 @@ public class Process {
         ch = sc.nextInt();
         Cache cache;
         //writeBack = 2 writeThrough = 1
+        int replacePolicy = 3,writePolicy = 2;
         if(ch==2){
-            cache = new SetAssociative(4,4,mem,2,1);
+            cache = new SetAssociative(4,4,mem,writePolicy,replacePolicy);
         }
         else if(ch==1){
-            cache = new DirectMapped(4,4,mem,2,1);
+            cache = new DirectMapped(4,4,mem,writePolicy,replacePolicy);
         }
         else{
-            cache = new FullyAssociative(4,4,mem,2,1);
+            cache = new FullyAssociative(4,4,mem,writePolicy,replacePolicy);
         }
 
         s.cache = cache;
