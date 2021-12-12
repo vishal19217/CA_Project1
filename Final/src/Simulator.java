@@ -1,3 +1,5 @@
+import javax.sound.midi.Instrument;
+
 public class Simulator{
     boolean isSt;
     boolean isLd;
@@ -30,6 +32,7 @@ public class Simulator{
     boolean isBge;
     boolean isLui;
     boolean isOffset;
+    boolean isCacheUsed;
     boolean isBranchTaken=false;
     String pc,branchTarget,fhinst;
     int [] registerFile;
@@ -163,15 +166,28 @@ public class Simulator{
     }
     public  void fetch(String pc){
         this.pc = pc;
-        int adr = Integer.parseInt(pc,2);
-        String fh_inst = mem[adr];
-        fhinst = fh_inst;
+
+        if(isCacheUsed){
+            pc = "0".repeat(32-pc.length())+pc;
+            String fh_inst = cache.read(pc);
+            System.out.println("Instrution:"+fh_inst);
+            updateControlSignal(fh_inst);
+            fhinst = fh_inst;
+//        System.out.println("Instruction:-"+fh_inst);
+            decode(fh_inst);
+        }
+        else{
+
+            int adr = Integer.parseInt(pc,2);
+            String fh_inst = mem[adr];
+            fhinst = fh_inst;
 
 
-        updateControlSignal(fh_inst);
+            updateControlSignal(fh_inst);
 //        System.out.println("Instruction:-"+fh_inst);
 
-        decode(fh_inst);
+            decode(fh_inst);
+        }
 
     }
     public int twoComplement(String num){

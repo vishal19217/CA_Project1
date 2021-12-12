@@ -8,6 +8,8 @@ public class Process {
     static String pc=null;
     static int totalTime=0;
     static String []mem;
+    static Cache cache;
+    static boolean isCacheUsed=false;
     static int [] registerFile = new int[32];
     public static void MemInitialise(int memCap){
         mem = new String[memCap];
@@ -76,8 +78,27 @@ public class Process {
         BufferedReader br = new BufferedReader(new FileReader(assemblyFile));
         String codeLine;
         while((codeLine=br.readLine())!=null){
-            mem[id] = codeLine;
-            id++;
+            if(isCacheUsed){
+                String store = codeLine;
+                String add = Integer.toBinaryString((int)id);
+                add = "0".repeat(32-add.length())+add;
+                if(store.length()<32){
+                    int l = store.length();
+                    for(int i=0;i<32-l;i++){
+                        store = "0"+store;
+
+                    }
+                }
+//            System.out.println("Data:"+store);
+                cache.write(add,store);
+                mem[id] = codeLine;
+                id++;
+
+            }
+            else {
+                mem[id] = codeLine;
+                id++;
+            }
         }
     }
     public static void main(String[] args) throws IOException {
@@ -101,27 +122,35 @@ public class Process {
         }
         System.out.println("Enter the Access Time(in cycles where 1 access time = 1 cycle) for Memory Operations:-");
         int at = sc.nextInt();
-        assembler.convertAssembly();//converting assembly to binary
-        storeInstructions(mem);
-
-        pc = Integer.toBinaryString(0);
         Simulator s = new Simulator(registerFile,mem,at);
         System.out.println("Enter the choice 1)For Direct Map 2)For Set Associative 3) For Fully Associative");
         ch = sc.nextInt();
-        Cache cache;
+        isCacheUsed = true;
+        s.isCacheUsed = true;
         //writeBack = 2 writeThrough = 1
         int replacePolicy = 3,writePolicy = 2;
         if(ch==2){
-            cache = new SetAssociative(4,4,mem,writePolicy,replacePolicy);
+            cache = new SetAssociative(12,4,mem,writePolicy,replacePolicy);
         }
         else if(ch==1){
-            cache = new DirectMapped(4,4,mem,writePolicy,replacePolicy);
+            cache = new DirectMapped(12,4,mem,writePolicy,replacePolicy);
         }
         else{
-            cache = new FullyAssociative(4,4,mem,writePolicy,replacePolicy);
+            cache = new FullyAssociative(12,4,mem,writePolicy,replacePolicy);
         }
 
         s.cache = cache;
+
+
+
+
+        //converting assembly code to machine code
+        assembler.convertAssembly();//converting assembly to binary
+        //storing instructions from cache
+        storeInstructions(mem);
+
+        pc = Integer.toBinaryString(0);
+
 //        cache.print();
         while(mem[Integer.parseInt(pc,2)]!=null){
             s.initialise();

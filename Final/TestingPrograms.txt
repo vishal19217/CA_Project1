@@ -75,3 +75,27 @@ bge r3 r2 mod
 jalr r5 r31 0
 notprime: addi r0 r0 0
 exit: addi r5 r5 5
+
+
+
+
+7)
+addi r1 r1 10
+sw r1 20(r0)
+addi r3 r3 5
+sw r3 25(r0)
+addi r2 r2 8
+sw r2 30(r0)
+addi r4 r4 7
+sw r4 21(r0)
+lw r5 20(r0)
+lw r6 25(r0)
+lw r7 30(r0)
+lw r8 21(r0)
+addi r15 r15 4
+sw r15 55(r0)
+lw r9 55(r0)
+addi r18 r18 20
+sw r18 45(r0)
+addi r19 r19 6
+sw r19 25(r0)
