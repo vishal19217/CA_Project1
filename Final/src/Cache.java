@@ -41,6 +41,9 @@ public abstract class Cache {
     public void updateFIFO(int blockPos){
 
     }
+    public void updateRandom(){
+
+    }
 }
 
 

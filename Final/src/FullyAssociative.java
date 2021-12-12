@@ -25,54 +25,18 @@ import java.util.*;
                     for (int j = 0; j < blockSize; j++) {
                         dataArray[i][j] = mem[startIdx + j];
                     }
+                    return i;
                 }
-                return i;
+
             }
             return 0;
         }
-//
-//            // FIFO Implementation
-//            String[] tempd = blockdata;
-//            String tempa = "10"+tag;
-//
-//            for(int j = 0;j<size;j++) {
-//                String[] TEMPD = tempd;
-//                String TEMPA = tempa;
-//                tempd = dataArray[j];
-//                tempa = tagArray[j];
-//                dataArray[j] = TEMPD;
-//                tagArray[j] = TEMPA;
-//            }
-//
-//            if(tempa.substring(1,2).equals("1")) {            // Checking if the evicted block is modified and if yes
-//                String tag2 = tempa.substring(2,tagSize+2);   // then updating it in the memory.
-//                String loc2 = tag;
-//                String zeros2 = "0".repeat(offset);
-//                loc2 = loc2 + zeros2;
-//                int startIdx2 = Integer.parseInt(loc2, 2);
-//                for(int i = 0;i<blockSize;i++) {
-//                    mem[startIdx2+i] = tempd[i];
-//                }
-//            }
-//
-//            int pos = 0;
-//            return(pos);            // Returns position of inserted block in Cache
-//
-//        }
 
-
-//        if(writePolicy == 1){ // write policy is write through
-//            tagArray[i] = "10"+tag;
-//            dataArray[i][dataLoc] = data;
-//            mem[Integer.parseInt(address, 2)] = data;
-//        }
-//                    else{ // write policy is write back
-//            tagArray[i] = "11"+tag;
-//            dataArray[i][dataLoc] = data;
-//        }
         @Override
         public void write(String address, String data){
             String tag = address.substring(0, tagSize);
+            System.out.println(tagSize);
+            System.out.println(tag);
             //String idxBin = address.substring(tagSize, tagSize+index);
             String dataLocBin = address.substring(tagSize, 32);
             int dataLoc = Integer.parseInt(dataLocBin, 2);
@@ -173,8 +137,12 @@ import java.util.*;
             String dataLocBin = address.substring(tagSize, 32);
             int dataLoc = Integer.parseInt(dataLocBin, 2);
             //Check Cache Hit
+//            print();
+//          System.out.println(tag);
+//          System.out.println(tagArray[0].substring(2,tagSize));
             for(int i = 0;i<size;i++) {
-                if(tagArray[i]!=null && tagArray[i].substring(2,tagSize).equals(tag)){ // cache hit
+                if(tagArray[i]!=null && tagArray[i].substring(2).equals(tag)){ // cache hit
+
                     return(dataArray[i][dataLoc]);
                 }
             }
@@ -200,7 +168,7 @@ import java.util.*;
                 blockPos = insert(address);
             }
 
-//            System.out.println("data:"+dataArray[blockPos][dataLoc]);
+            System.out.println("data:"+dataArray[blockPos][dataLoc]);
             return dataArray[blockPos][dataLoc];
         }
 
@@ -224,3 +192,43 @@ import java.util.*;
     }
 
 
+//
+//            // FIFO Implementation
+//            String[] tempd = blockdata;
+//            String tempa = "10"+tag;
+//
+//            for(int j = 0;j<size;j++) {
+//                String[] TEMPD = tempd;
+//                String TEMPA = tempa;
+//                tempd = dataArray[j];
+//                tempa = tagArray[j];
+//                dataArray[j] = TEMPD;
+//                tagArray[j] = TEMPA;
+//            }
+//
+//            if(tempa.substring(1,2).equals("1")) {            // Checking if the evicted block is modified and if yes
+//                String tag2 = tempa.substring(2,tagSize+2);   // then updating it in the memory.
+//                String loc2 = tag;
+//                String zeros2 = "0".repeat(offset);
+//                loc2 = loc2 + zeros2;
+//                int startIdx2 = Integer.parseInt(loc2, 2);
+//                for(int i = 0;i<blockSize;i++) {
+//                    mem[startIdx2+i] = tempd[i];
+//                }
+//            }
+//
+//            int pos = 0;
+//            return(pos);            // Returns position of inserted block in Cache
+//
+//        }
+
+
+//        if(writePolicy == 1){ // write policy is write through
+//            tagArray[i] = "10"+tag;
+//            dataArray[i][dataLoc] = data;
+//            mem[Integer.parseInt(address, 2)] = data;
+//        }
+//                    else{ // write policy is write back
+//            tagArray[i] = "11"+tag;
+//            dataArray[i][dataLoc] = data;
+//        }

@@ -386,6 +386,7 @@ public class Simulator{
                 String add = Integer.toBinaryString((int)res);
                 add = "0".repeat(32-add.length())+add;
                 String ldResult = cache.read(add);
+
                 res = Integer.parseInt(ldResult,2);
             }
 
