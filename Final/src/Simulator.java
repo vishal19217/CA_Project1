@@ -394,6 +394,7 @@ public class Simulator{
         }
         if(isLui){
             aluResult = (int)val[2];
+
             aluResult = (int)aluResult<<12;
 
         }
